@@ -1,40 +1,18 @@
 <template>
-  <div
-      style="background: #F8F8F8"
-      @touchmove.prevent>
-    首页
-    <div>
-      {{ $store.state.openId }}
+    <div id="home">
+        <router-view></router-view>
     </div>
-    
-    <button  @click="$router.push('/profile')">跳转</button>
-  </div>
 </template>
 
 <script>
-
-import wx from 'weixin-js-sdk';
-
 export default {
-  name: "Home",
-  data() {
-    return {
-      userInfo: {}
-    }
-  },
-  created() {
-  
-  },
-  methods: {
-  
-  },
-  mounted() {
-  
-  }
+    name: 'Home'
 }
 </script>
 
-<style
-    scoped>
-
+<style scoped>
+    #home{
+        width: 100%;
+        height: 100%;
+    }
 </style>

@@ -11,6 +11,8 @@
     "better-scroll": "^1.15.2",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "echarts": "^4.8.0",
+    "moment": "^2.27.0",
     "vue-clipboard2": "^0.3.1",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0",
@@ -24,6 +26,8 @@
     "@vue/cli-plugin-vuex": "^4.4.0",
     "@vue/cli-service": "^4.4.0",
     "vue-template-compiler": "^2.6.11",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
     "weixin-js-sdk": "^1.6.0"
   },
   "browserslist": [

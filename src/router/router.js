@@ -9,6 +9,11 @@ import constUrls
 Vue.use(VueRouter)
 
 const Home = () => import('views/home/Home');
+const HomeIndex = () => import('views/home/childComps/Index');
+const MaintenanceCollision = () => import('views/home/childComps/MaintenanceCollision');
+const VehicleConditionEvaluation = () => import('views/home/childComps/VehicleConditionEvaluation');
+const CarCondition = () => import('views/home/childComps/CarCondition');
+const VehicleIdentify = () => import('views/home/childComps/VehicleIdentify');
 const Promotion = () => import('views/promotion/Promotion');
 const Order = () => import('views/order/Order');
 const Profile = () => import('views/profile/Profile');
@@ -44,12 +49,54 @@ const routes = [
     component: Login
   },
   {
-    path: '/home',
+    path:'/home',
     name: 'Home',
     meta: {
       title: '首页'
     },
-    component: Home
+    component: Home,
+    children: [
+      {
+        path: '',
+        name: 'HomeIndex',
+        meta: {
+          title: '首页'
+        },
+        component: HomeIndex
+      },
+      {
+        path: 'maintenance',
+        name: 'MaintenanceCollision',
+        meta: {
+          title: '维保碰撞'
+        },
+        component: MaintenanceCollision
+      },
+      {
+        path: 'evaluation',
+        name: 'VehicleConditionEvaluation',
+        meta: {
+          title: '车况估价'
+        },
+        component: VehicleConditionEvaluation
+      },
+      {
+        path: 'carcondition',
+        name: 'CarCondition',
+        meta: {
+          title: '车况估价'
+        },
+        component: CarCondition
+      },
+      {
+        path: 'identify',
+        name: 'VehicleIdentify',
+        meta: {
+          title: '车型识别'
+        },
+        component: VehicleIdentify
+      },
+    ]
   },
   {
     path: '/order',
@@ -175,30 +222,30 @@ const router = new VueRouter({
 //判断登录状态
 router.beforeEach((to, from, next) => {
   //TODO 判断登录状态 开发阶段关闭
-  let login = router.app.$options.store.state.login;
-  console.log(to.path)
-  //1.判断登录状态
-  if (to.path === '/login') {
-    next();
-  } else {
+  // let login = router.app.$options.store.state.login;
+  // console.log(to.path)
+  // //1.判断登录状态
+  // if (to.path === '/login') {
+  //   next();
+  // } else {
 
-    if (login) {
-      //2.已登录，跳转
-      console.log('已登录，跳转')
-      next();
-    } else {
-      //3.未登录,跳转登录授权页面
-      router.replace({
-        path: '/login',
-        query: {
-          target: to.path.indexOf('/'+1)
-        }
-      })
-    }
-  }
-  console.log(to);
+  //   if (login) {
+  //     //2.已登录，跳转
+  //     console.log('已登录，跳转')
+  //     next();
+  //   } else {
+  //     //3.未登录,跳转登录授权页面
+  //     router.replace({
+  //       path: '/login',
+  //       query: {
+  //         target: to.path.indexOf('/'+1)
+  //       }
+  //     })
+  //   }
+  // }
+  // console.log(to);
 
-  document.title = to.meta.title;
+  // document.title = to.meta.title;
   // TODO 判断是否微信浏览器(发布后放开)
   // let ua = judgeUserAgent();
   // if (!ua) {

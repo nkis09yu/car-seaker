@@ -55,3 +55,33 @@ a {
   float: right;
 }
 
+.br-16{
+  border-radius: 8px;
+}
+.white{
+  background-color: #fff;
+}
+.d-flex{
+  display: flex;
+}
+.bold{
+  font-weight: 999;
+}
+.jc-between{
+  justify-content: space-between;
+}
+.al-center{
+  align-items: center;
+}
+.color-999{
+  color: #999;
+}
+.color-333{
+  color: #333;
+}
+.fz-28{
+  font-size: 14px;
+}
+.fz-34{
+  font-size: 17px;
+}

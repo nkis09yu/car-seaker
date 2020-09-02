@@ -6,6 +6,8 @@ import VueClipboard from 'vue-clipboard2'
 import weui from "weui.js/dist/weui";
 import 'weui'
 
+import moment from 'moment'
+Vue.prototype.$moment = moment
 
 Vue.prototype.$weui = weui;
 

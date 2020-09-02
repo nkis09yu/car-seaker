@@ -45,7 +45,7 @@ export default {
 }
 
 .main-tab-bar {
-  position: relative;
+  position: fixed;
   z-index: 9;
   height: 55px;
   width: 100%;
