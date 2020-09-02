@@ -245,7 +245,7 @@ router.beforeEach((to, from, next) => {
   // }
   // console.log(to);
 
-  // document.title = to.meta.title;
+   document.title = to.meta.title;
   // TODO 判断是否微信浏览器(发布后放开)
   // let ua = judgeUserAgent();
   // if (!ua) {
