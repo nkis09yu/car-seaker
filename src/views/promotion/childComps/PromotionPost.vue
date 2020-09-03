@@ -1,15 +1,15 @@
 <template>
-  <div class="promotion-post-page-container" @touchmove.capture>
+  <div class="promotion-post-page-container" @touchmove="touchControl">
     <div class="post-page-head-container">
-      <img id="post-background" :src="backgroundPic" alt="">
+      <img id="post-background" @load="drawCanvas" :src="backgroundPic" alt="">
       <div class="qrcode-container" :style="{height:calcSize(295.5)+'px'}">
         <div
             :style="{left:((windowWidth-40)/2 - calcSize(65)/2)+'px',width:calcSize(65)+'px',height: calcSize(65)+'px',top:calcSize(-33)+'px'}"
             class="post-user-icon-container">
-          <img id="post-user-head-icon"
-               src="~assets/img/promotion/post/qrcode.png"
+          <img id="post-user-head-icon" @load="drawCanvas"
+               :src="$store.state.userInfo.headimgurl"
                alt="头像">
-          <!--          :src="$store.state.userInfo.headimgurl"-->
+          <!--          -->
         
         </div>
         <div :style="{top:calcSize(35)+'px'}" class="post-message-container">
@@ -17,7 +17,7 @@
         </div>
         <div :style="{top:calcSize(81.5)+'px',height:calcSize( 160)+'px'}" class="post-qrcode-container">
           <div :style="{width:calcSize( 160)+'px',left:(windowWidth/2-20-calcSize(160)/2)+'px'}">
-            <img id="post-qr-code-pic"
+            <img id="post-qr-code-pic" @load="drawCanvas"
                  :style="{width:calcSize(140)+'px',height:calcSize(140)+'px',left:calcSize(10)+'px',top:calcSize(10)+'px'}"
                  src="~assets/img/promotion/post/qrcode.png"
                  alt="二维码">
@@ -47,8 +47,8 @@
       </div>
       <div @click="showGuide=false">我知道了</div>
     </div>
-    <canvas id="canvas" width="375px" height="625px"
-            style="position: absolute;top:0;z-index: -99"></canvas>
+    <canvas id="canvas" width="375px" height="630px"
+            style="display: none"></canvas>
   
   </div>
 </template>
@@ -80,26 +80,18 @@ export default {
     }
   },
   methods: {
-    
+    touchControl(e){
+      console.log(e)
+      console.log(document.getElementsByClassName("promotion-post-page-container")[0].clientHeight)
+    },
     changePostImg() {
       ++this.currentPicIndex === 3 ? this.currentPicIndex = 0 : null;
-      this.drawCanvas();
     },
     getPromotionPost() {
       //canvas生成图片并上传
       let baseImage = this.canvas.toDataURL("image/png");
       let image = this.dataURItoBlob(baseImage)
       console.log(image)
-      
-      let fd = new FormData();
-      //fileData为自定义
-      //fd.append("postPic", image);
-      //fd.append("fileName", "123jpg")
-      //promotionPostUpload(fd).then(res=>{
-      //  console.log(res)
-      //}).catch(err=>{
-      //  console.log(err)
-      //})
       
       let param = new FormData()  // 创建form对象
       param.append('postPic', image)  // 通过append向form对象添加数据
@@ -111,29 +103,48 @@ export default {
       Axios.post('http://localhost:9096/file/post', param, config)
           .then(res => {
             console.log(res)
+            //定义微信提示
+            let toast = this.$weui.dialog({
+              title: '获取提示',
+              content: '获取成功，稍后请留意公众号消息',
+              className: 'wx-toast-custom',
+              buttons: [
+                {
+                  label: '我知道了',
+                  type: 'primary',
+                  onClick: () => {
+                    toast.hide(() => {
+                      this.$router.replace('/promotion/manage')
+                    })
+                  }
+                }
+              ]
+            })
           })
           .catch(err => {
             console.log(err)
+  
+            //定义微信提示
+            let toast = this.$weui.dialog({
+              title: '获取失败',
+              content: '获取失败，请稍后重试',
+              className: 'wx-toast-custom',
+              buttons: [
+                {
+                  label: '确定',
+                  type: 'primary',
+                  onClick: () => {
+                    toast.hide(() => {
+                      this.$router.replace('/promotion/manage')
+                    })
+                  }
+                }
+              ]
+            })
           })
       
       
-      //定义微信提示
-      let toast = this.$weui.dialog({
-        title: '获取提示',
-        content: '获取成功，稍后请留意公众号消息',
-        className: 'wx-toast-custom',
-        buttons: [
-          {
-            label: '我知道了',
-            type: 'primary',
-            onClick: () => {
-              toast.hide(() => {
-                this.$router.replace('/promotion/manage')
-              })
-            }
-          }
-        ]
-      })
+      
       
     },
     dataURItoBlob(base64Data) {
@@ -166,6 +177,8 @@ export default {
     },
     drawCanvas() {
       //todo 移除透明度
+      console.log("开始绘制")
+      this.ctx.clearRect(0,0,375,630)
       this.ctx.globalAlpha = 1
       //绘制背景色
       this.ctx.rect(0, 0, 375, 620)
@@ -204,6 +217,10 @@ export default {
       this.ctx.textAlign = 'center'
       this.ctx.fillStyle = '#000000'
       this.ctx.fillText(this.userinfoDisplay, 186, 365)
+      //绘制二维码边框
+      this.ctx.rect(108, 395, 160, 160)
+      this.ctx.fillStyle = '#F8F8F8'
+      this.ctx.fill()
       //绘制二维码
       this.ctx.drawImage(document.getElementById('post-qr-code-pic'), 118, 405, 140, 140)
       //绘制有效期文字
@@ -211,6 +228,8 @@ export default {
       this.ctx.textAlign = 'center'
       this.ctx.fillStyle = '#000000'
       this.ctx.fillText(this.limitDate, 185, 587)
+      //this.ctx.fillText(this.limitDate, 185, 599)
+      console.log("绘制完成")
     }
     
   },
@@ -219,16 +238,16 @@ export default {
       return this.backgroundList[this.currentPicIndex]
     },
     userinfoDisplay() {
-      return '你好，我是' + (typeof (this.$store.state.userInfo.nickname) === 'undefined' ? '' : this.$store.state.userInfo.nickname) + '\ud83d\ude08,向你推荐[365查车]'
+      return '你好，我是' + (typeof (this.$store.state.userInfo.nickname) === 'undefined' ? '' : this.$store.state.userInfo.nickname) + ',向你推荐[365查车]'
     },
   },
   mounted() {
-    console.log(window.innerWidth)
     this.windowWidth = window.innerWidth;
     this.initWx()
     this.canvas = document.getElementById('canvas');
     this.ctx = this.canvas.getContext('2d')
-    this.drawCanvas()
+    document.getElementsByClassName("promotion-post-page-container")[0].scrollIntoView(true)
+  
   }
 }
 </script>
