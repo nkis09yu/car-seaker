@@ -1,28 +1,30 @@
 <template>
   <div class="promotion-post-page-container" @touchmove.capture>
     <div class="post-page-head-container">
-      <img :src="backgroundPic" alt="">
+      <img id="post-background" :src="backgroundPic" alt="">
       <div class="qrcode-container" :style="{height:calcSize(295.5)+'px'}">
         <div
             :style="{left:((windowWidth-40)/2 - calcSize(65)/2)+'px',width:calcSize(65)+'px',height: calcSize(65)+'px',top:calcSize(-33)+'px'}"
             class="post-user-icon-container">
-          <img
-              :src="$store.state.userInfo.headimgurl"
-              alt="头像">
+          <img id="post-user-head-icon"
+               src="~assets/img/promotion/post/qrcode.png"
+               alt="头像">
+          <!--          :src="$store.state.userInfo.headimgurl"-->
+        
         </div>
         <div :style="{top:calcSize(35)+'px'}" class="post-message-container">
-          你好，我是{{ $store.state.userInfo.nickname }},向你推荐[365查车]
+          {{ userinfoDisplay }}
         </div>
         <div :style="{top:calcSize(81.5)+'px',height:calcSize( 160)+'px'}" class="post-qrcode-container">
           <div :style="{width:calcSize( 160)+'px',left:(windowWidth/2-20-calcSize(160)/2)+'px'}">
-            <img
-                :style="{width:calcSize(140)+'px',height:calcSize(140)+'px',left:calcSize(10)+'px',top:calcSize(10)+'px'}"
-                src="~assets/img/promotion/post/qrcode.png"
-                alt="头像">
+            <img id="post-qr-code-pic"
+                 :style="{width:calcSize(140)+'px',height:calcSize(140)+'px',left:calcSize(10)+'px',top:calcSize(10)+'px'}"
+                 src="~assets/img/promotion/post/qrcode.png"
+                 alt="二维码">
           </div>
         </div>
         <div :style="{top:calcSize( 261.5)+'px'}" class="post-limit-container">
-          长按识别关注，有效期至：2020-10-20
+          {{ limitDate }}
         </div>
       </div>
     </div>
@@ -45,12 +47,18 @@
       </div>
       <div @click="showGuide=false">我知道了</div>
     </div>
+    <canvas id="canvas" width="375px" height="625px"
+            style="position: absolute;top:0;z-index: -99"></canvas>
   
   </div>
 </template>
 
 <script>
 import {wx} from 'weixin-js-sdk'
+import {promotionPostUpload} from "@/network/Promotion";
+import Axios
+  from "axios";
+
 
 export default {
   name: "PromotionPost",
@@ -66,16 +74,51 @@ export default {
       showGuide: false,
       baseWidth: 375,
       windowWidth: 375,
-      wx: {}
+      wx: {},
+      ctx: {},
+      limitDate: '长按识别关注，有效期至：2020-10-20',
     }
   },
   methods: {
+    
     changePostImg() {
-      ++this.currentPicIndex === 3 ? this.currentPicIndex = 0 : null
+      ++this.currentPicIndex === 3 ? this.currentPicIndex = 0 : null;
+      this.drawCanvas();
     },
     getPromotionPost() {
+      //canvas生成图片并上传
+      let baseImage = this.canvas.toDataURL("image/png");
+      let image = this.dataURItoBlob(baseImage)
+      console.log(image)
+      
+      let fd = new FormData();
+      //fileData为自定义
+      //fd.append("postPic", image);
+      //fd.append("fileName", "123jpg")
+      //promotionPostUpload(fd).then(res=>{
+      //  console.log(res)
+      //}).catch(err=>{
+      //  console.log(err)
+      //})
+      
+      let param = new FormData()  // 创建form对象
+      param.append('postPic', image)  // 通过append向form对象添加数据
+      param.append('chunk', '0') // 添加form表单中其他数据
+      console.log(param.get('file')) // FormData私有类对象，访问不到，可以通过get判断值是否传进去
+      let config = {
+        headers: {'Content-Type': 'multipart/form-data'}
+      }
+      Axios.post('http://localhost:9096/file/post', param, config)
+          .then(res => {
+            console.log(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      
+      
       //定义微信提示
-     let toast =  this.$weui.dialog({
+      let toast = this.$weui.dialog({
         title: '获取提示',
         content: '获取成功，稍后请留意公众号消息',
         className: 'wx-toast-custom',
@@ -83,15 +126,28 @@ export default {
           {
             label: '我知道了',
             type: 'primary',
-            onClick:  ()=>{
-              toast.hide(()=>{
+            onClick: () => {
+              toast.hide(() => {
                 this.$router.replace('/promotion/manage')
               })
             }
           }
         ]
       })
-     
+      
+    },
+    dataURItoBlob(base64Data) {
+      var byteString;
+      if (base64Data.split(',')[0].indexOf('base64') >= 0)
+        byteString = atob(base64Data.split(',')[1]);
+      else
+        byteString = unescape(base64Data.split(',')[1]);
+      var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];
+      var ia = new Uint8Array(byteString.length);
+      for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ia], {type: mimeString});
     },
     calcSize(val) {
       return val * this.windowWidth / this.baseWidth;
@@ -107,6 +163,54 @@ export default {
       //  jsApiList: [] // 必填，需要使用的JS接口列表
       //});
       //this.wx=wx;
+    },
+    drawCanvas() {
+      //todo 移除透明度
+      this.ctx.globalAlpha = 1
+      //绘制背景色
+      this.ctx.rect(0, 0, 375, 620)
+      this.ctx.fillStyle = '#F8F8F8'
+      this.ctx.fill()
+      //绘制背景图
+      this.ctx.drawImage(document.getElementById('post-background'), 0, 0, 375, 603)
+      //绘制二维码背景图
+      this.ctx.beginPath()
+      this.ctx.fillStyle = '#FFFFFF'
+      this.ctx.moveTo(20, 320)
+      this.ctx.arcTo(20, 312, 28, 312, 8)
+      this.ctx.lineTo(347, 312)
+      this.ctx.arcTo(355, 312, 355, 320, 8)
+      this.ctx.lineTo(355, 608)
+      this.ctx.lineTo(20, 608)
+      this.ctx.closePath()
+      this.ctx.fill()
+      //绘制头像
+      this.ctx.save()
+      this.ctx.beginPath()
+      this.ctx.arc(375 / 2, 310, 33, 0, 2 * Math.PI)
+      this.ctx.clip()
+      this.ctx.drawImage(document.getElementById('post-user-head-icon'), 315 / 2, 280, 60, 60)
+      
+      this.ctx.restore()
+      //绘制头像边框
+      this.ctx.fillStyle = '#FFFFFF'
+      this.ctx.strokeStyle = '#ffffff'
+      this.ctx.lineWidth = 5
+      this.ctx.arc(375 / 2, 310, 35, 0, 2 * Math.PI)
+      
+      this.ctx.stroke()
+      //绘制姓名和文字
+      this.ctx.font = 'small-caps normal 14px arial'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fillText(this.userinfoDisplay, 186, 365)
+      //绘制二维码
+      this.ctx.drawImage(document.getElementById('post-qr-code-pic'), 118, 405, 140, 140)
+      //绘制有效期文字
+      this.ctx.font = 'small-caps bold 16px arial'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fillText(this.limitDate, 185, 587)
     }
     
   },
@@ -114,11 +218,17 @@ export default {
     backgroundPic() {
       return this.backgroundList[this.currentPicIndex]
     },
+    userinfoDisplay() {
+      return '你好，我是' + (typeof (this.$store.state.userInfo.nickname) === 'undefined' ? '' : this.$store.state.userInfo.nickname) + '\ud83d\ude08,向你推荐[365查车]'
+    },
   },
   mounted() {
     console.log(window.innerWidth)
     this.windowWidth = window.innerWidth;
     this.initWx()
+    this.canvas = document.getElementById('canvas');
+    this.ctx = this.canvas.getContext('2d')
+    this.drawCanvas()
   }
 }
 </script>
