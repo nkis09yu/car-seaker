@@ -9,7 +9,7 @@
           <img id="post-user-head-icon" @load="drawCanvas"
                :src="$store.state.userInfo.headimgurl"
                alt="头像">
-          <!--          -->
+          <!---->
         
         </div>
         <div :style="{top:calcSize(35)+'px'}" class="post-message-container">
@@ -135,7 +135,7 @@ export default {
                   type: 'primary',
                   onClick: () => {
                     toast.hide(() => {
-                      this.$router.replace('/promotion/manage')
+                      //this.$router.replace('/promotion/manage')
                     })
                   }
                 }
@@ -181,7 +181,7 @@ export default {
       this.ctx.clearRect(0,0,375,630)
       this.ctx.globalAlpha = 1
       //绘制背景色
-      this.ctx.rect(0, 0, 375, 620)
+      this.ctx.rect(0, 0, 375, 630)
       this.ctx.fillStyle = '#F8F8F8'
       this.ctx.fill()
       //绘制背景图
@@ -218,9 +218,11 @@ export default {
       this.ctx.fillStyle = '#000000'
       this.ctx.fillText(this.userinfoDisplay, 186, 365)
       //绘制二维码边框
+      this.ctx.beginPath()
       this.ctx.rect(108, 395, 160, 160)
       this.ctx.fillStyle = '#F8F8F8'
       this.ctx.fill()
+      this.ctx.closePath()
       //绘制二维码
       this.ctx.drawImage(document.getElementById('post-qr-code-pic'), 118, 405, 140, 140)
       //绘制有效期文字
