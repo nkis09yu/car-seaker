@@ -81,8 +81,8 @@ export default {
   },
   methods: {
     touchControl(e){
-      console.log(e)
-      console.log(document.getElementsByClassName("promotion-post-page-container")[0].clientHeight)
+      // console.log(e)
+      // console.log(document.getElementsByClassName("promotion-post-page-container")[0].clientHeight)
     },
     changePostImg() {
       ++this.currentPicIndex === 3 ? this.currentPicIndex = 0 : null;
@@ -91,18 +91,18 @@ export default {
       //canvas生成图片并上传
       let baseImage = this.canvas.toDataURL("image/png");
       let image = this.dataURItoBlob(baseImage)
-      console.log(image)
+      // console.log(image)
       
       let param = new FormData()  // 创建form对象
       param.append('postPic', image)  // 通过append向form对象添加数据
       param.append('chunk', '0') // 添加form表单中其他数据
-      console.log(param.get('file')) // FormData私有类对象，访问不到，可以通过get判断值是否传进去
+      // console.log(param.get('file')) // FormData私有类对象，访问不到，可以通过get判断值是否传进去
       let config = {
         headers: {'Content-Type': 'multipart/form-data'}
       }
       Axios.post('http://localhost:9096/file/post', param, config)
           .then(res => {
-            console.log(res)
+            // console.log(res)
             //定义微信提示
             let toast = this.$weui.dialog({
               title: '获取提示',
@@ -177,7 +177,6 @@ export default {
     },
     drawCanvas() {
       //todo 移除透明度
-      console.log("开始绘制")
       this.ctx.clearRect(0,0,375,630)
       this.ctx.globalAlpha = 1
       //绘制背景色
@@ -231,7 +230,6 @@ export default {
       this.ctx.fillStyle = '#000000'
       this.ctx.fillText(this.limitDate, 185, 587)
       //this.ctx.fillText(this.limitDate, 185, 599)
-      console.log("绘制完成")
     }
     
   },
@@ -247,7 +245,27 @@ export default {
     this.windowWidth = window.innerWidth;
     this.initWx()
     this.canvas = document.getElementById('canvas');
+
     this.ctx = this.canvas.getContext('2d')
+    //解决生成图片模糊，关闭抗锯齿
+    this.ctx.mozImageSmoothingEnabled=false;
+    this.ctx.webkitImageSmoothingEnabled=false;
+    this.ctx.msImageSmoothingEnabled=false;
+    this.ctx.imageSmoothingEnabled=false;
+
+    //todo 图片模糊第二种解决方案，图片会变大
+    // let devicePixelRatio = window.devicePixelRatio || 1;
+    // let backingStoreRatio = this.ctx.webkitBackingStorePixelRatio ||
+    //     this.ctx.mozBackingStorePixelRatio ||
+    //     this.ctx.msBackingStorePixelRatio ||
+    //     this.ctx.oBackingStorePixelRatio ||
+    //     this.ctx.backingStorePixelRatio || 1;
+    // let ratio = devicePixelRatio / backingStoreRatio;
+    // this.canvas.width = this.canvas.width * ratio;
+    // this.canvas.width = this.canvas.height* ratio;
+    // this.ctx.scale(ratio, ratio);
+    // this.ctx.translate(0.5, 0.5);
+
     document.getElementsByClassName("promotion-post-page-container")[0].scrollIntoView(true)
   
   }

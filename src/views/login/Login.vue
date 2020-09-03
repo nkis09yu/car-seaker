@@ -16,9 +16,9 @@ export default {
     }
   },
   methods: {
-    
+
     judgeLogin() {
-      
+
       let urlParams = getUrlParams();
       let state = urlParams.state;
       if (typeof state == 'undefined'||state=="undefined"||state.indexOf("undefined")!=-1 || state == 'login') {
@@ -61,7 +61,7 @@ export default {
         this.$router.replace('/'+this.targetPage)
       }
       
-      //this.$router.replace("/home")
+      // this.$router.replace("/home")
     }
     
   },
