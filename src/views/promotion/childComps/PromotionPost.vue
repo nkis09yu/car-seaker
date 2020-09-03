@@ -1,4 +1,5 @@
 <template>
+  <div class="post-fix-container">
   <div class="promotion-post-page-container" @touchmove="touchControl">
     <div class="post-page-head-container">
       <img id="post-background" @load="drawCanvas" :src="backgroundPic" alt="">
@@ -50,6 +51,8 @@
     <canvas id="canvas" width="375px" height="630px"
             style="display: none"></canvas>
   
+  </div>
+
   </div>
 </template>
 
@@ -267,12 +270,21 @@ export default {
     // this.ctx.translate(0.5, 0.5);
 
     document.getElementsByClassName("promotion-post-page-container")[0].scrollIntoView(true)
-  
+
   }
 }
 </script>
 
 <style scoped>
+.post-fix-container{
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  z-index: 200;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: red;
+}
 
 .promotion-post-page-container {
   width: 100vw;
