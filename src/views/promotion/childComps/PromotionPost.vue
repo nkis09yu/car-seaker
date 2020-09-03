@@ -276,7 +276,6 @@ export default {
 
 .promotion-post-page-container {
   width: 100vw;
-  height: auto;
   position: relative;
   background: #f8f8f8;
   z-index: 200;
