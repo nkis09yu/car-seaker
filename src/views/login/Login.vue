@@ -24,9 +24,9 @@ export default {
       if (typeof state == 'undefined'||state=="undefined"||state.indexOf("undefined")!=-1 || state == 'login') {
         state = 'home';
       }
-      
+
       this.targetPage = state
-      
+
       //未登录
       if (!this.$store.state.login) {
         console.log('not login')
@@ -44,7 +44,7 @@ export default {
                 this.$store.commit('setOpenId', openid)
                 this.$store.commit('setHasSubscribe', hasSubscribe)
                 //TODO 根据关注状态判断是否跳转关注页面
-                
+
                 getUserInfo(openid)
                     .then(json => {
                       let url=window.location.href;
@@ -60,7 +60,9 @@ export default {
         console.log('login ok')
         this.$router.replace('/'+this.targetPage)
       }
-    },
+      
+      //this.$router.replace("/home")
+    }
     
   },
   created() {
