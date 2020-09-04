@@ -1,5 +1,5 @@
 <template>
-  <div class="promotion-manage" >
+  <div class="promotion-manage" @touchmove.self.prevent>
     <!--顶部显示余额模块-->
     <div class="title-container">
       <PromotionTitle @toCashOutPage="toOtherPage('/promotion/cashout')"></PromotionTitle>
