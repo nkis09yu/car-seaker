@@ -31,7 +31,8 @@ export default {
       if (!this.$store.state.login) {
         console.log('not login')
         if (urlParams.code === '' || urlParams.code === undefined) {
-          let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + constParams.appId + '&redirect_uri=' + encodeURIComponent(constParams.redirectUrl) + '&response_type=code&scope=snsapi_base&state=' + state + '#wechat_redirect';
+          //todo userinfo or base
+          let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + constParams.appId + '&redirect_uri=' + encodeURIComponent(constParams.redirectUrl) + '&response_type=code&scope=snsapi_userinfo&state=' + state + '#wechat_redirect';
           console.log(url)
           window.location.href = url;
         } else {
@@ -51,7 +52,7 @@ export default {
                       this.$store.commit('setUserInfo', json.data);
                       this.$store.commit('setLogin', 1);
                       //TODO 重写url 利用state跳转页面 重写导致wxjs签名失败？
-                      //history.replaceState({},'',(url.substr(0,url.indexOf('?'))+'#'+urlParams.state))
+                      history.replaceState({},'',(url.substr(0,url.indexOf('?'))+'#'+urlParams.state))
                       this.$router.push('/'+this.targetPage)
                     })
               })
