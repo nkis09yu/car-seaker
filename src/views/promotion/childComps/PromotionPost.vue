@@ -49,6 +49,7 @@
         <div @click="showGuide=false">我知道了</div>
       </div>
       <canvas id="canvas" style="display: none"></canvas>
+      <canvas id="canvas2" style="display: none"></canvas>
       <!--      <canvas id="canvas" style="position: absolute;z-index: -9999;top: 10px;left:50%"></canvas>-->
     
     </div>
@@ -95,7 +96,8 @@ export default {
     async getPromotionPost() {
       //alert('进入图片上传方法')
       //canvas生成图片并上传
-      let baseImage = this.canvas.toDataURL("image/png");
+      let baseImage = this.canvas.toDataURL("image/jpg");
+      //todo 压缩图片？
       let image = await this.dataURItoBlob(baseImage)
       // console.log(image)
       
