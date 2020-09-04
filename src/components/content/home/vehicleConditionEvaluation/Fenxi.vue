@@ -5,44 +5,54 @@
         </div>
         <div class="card-cont">
             <div class="d-flex">
-                <div class="d1">
-                    <div class="nr bold">{{piandi.money}}万</div>
+                <div class="d1" :style="{'width': percent(priceAnalyse.lowestDealPrice.ratio)}">
+                    <div class="nr bold">{{priceAnalyse.lowestDealPrice.price[0]}}万</div>
                     <div class="xt"></div>
-                    <p class="txt">偏低{{piandi.percent}}</p>
+                    <p class="txt">偏低{{percent(priceAnalyse.lowestDealPrice.ratio)}}</p>
                 </div>
-                <div class="d2">
+                <div class="d2" :style="{'width': percent(priceAnalyse.reasonableDealPrice.ratio)}">
                     <div class="nr d-flex bold">
-                        <p>{{heli.money1}}万</p>
-                        <p>{{heli.money2}}万</p>
+                        <p>{{priceAnalyse.reasonableDealPrice.price[0]}}万</p>
+                        <p>{{priceAnalyse.reasonableDealPrice.price[1]}}万</p>
                     </div>
                     <div class="xt"></div>
-                    <p class="txt">合理{{heli.percent}}</p>
+                    <p class="txt">合理{{percent(priceAnalyse.reasonableDealPrice.ratio)}}</p>
                 </div>
-                <div class="d3">
-                    <div class="nr bold">{{piangao.money}}万</div>
+                <div class="d3" :style="{'width': percent(priceAnalyse.highestDealPrice.ratio)}">
+                    <div class="nr bold">{{priceAnalyse.highestDealPrice.price[1]}}万</div>
                     <div class="xt"></div>
-                    <p class="txt">偏高{{piangao.percent}}</p>
+                    <p class="txt">偏高{{percent(priceAnalyse.highestDealPrice.ratio)}}</p>
                 </div>
             </div>
-            <div class="bot">90天内<b>{{people}}</b>人购买此车（来源于个人、车商、4S店）</div>
+            <div class="bot">数据来源于个人、车商、4S店等</div>
         </div>
     </card>
 </template>
 
 <script>
 import Card from '@/components/content/home/Card'
-import echarts from 'echarts'
 export default {
     components: { Card },
     props: {
         title: {
             type: String,
             required: true
-        }
+        },
+        marketPriceAnalyse: Object
     },
     data(){
         return {
-            people: 2004,
+            priceAnalyse: {
+                lowestDealPrice: {
+                    price: []
+                },
+                reasonableDealPrice: {
+                    price: []
+                },
+                highestDealPrice: {
+                    price: []
+                },
+            },
             piandi: {
                 money: 4.5,
                 percent: '30%'
@@ -58,11 +68,20 @@ export default {
             },
         }
     },
-    mounted(){
-
+    watch: {
+        marketPriceAnalyse: {
+            deep: true,
+            handler: function(val){
+                this.priceAnalyse = val;
+            }
+        }
     },
-    methods: {
-
+    computed: {
+        percent(){
+            return function(ratio){
+                return (Number(ratio)/(Number(this.priceAnalyse.lowestDealPrice.ratio)+Number(this.priceAnalyse.reasonableDealPrice.ratio)+Number(this.priceAnalyse.highestDealPrice.ratio)))*100 + '%';
+            }
+        }
     }
 }
 </script>
@@ -79,7 +98,6 @@ export default {
                     }
                 }
                 .d1{
-                    width: 30%;
                     div.xt{
                         height: 12px;
                         background-color: #ffbe5c;
@@ -91,7 +109,6 @@ export default {
                     }
                 }
                 .d2{
-                    width: 40%;
                     div.xt{
                         height: 12px;
                         background-color: #716dff;
@@ -102,7 +119,6 @@ export default {
                     }
                 }
                 .d3{
-                    width: 30%;
                     div.xt{
                         height: 12px;
                         background-color: #ff6666;

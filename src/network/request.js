@@ -7,7 +7,7 @@ export function request(config) {
   let instance = Axios.create({
     //baseUrl有跨域问题，暂不设置
     // baseURL: 'http://152.136.185.210:8000/api/z8',
-    //baseURL: 'http://yingyanchaxun.com/api/search_vehicle_index.php',
+    // baseURL: 'http://yingyanchaxun.com/api/search_vehicle_index.php',
     timeout: 5000,
     headers: {
       'Access-Control-Allow-Origin': '*',

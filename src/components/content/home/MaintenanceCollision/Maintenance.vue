@@ -41,6 +41,7 @@
                     </div>
                 </div>
             </div>
+            <div v-if="!recordsRep.length">暂无相关记录</div>
         </div>
     </Card>
 </template>

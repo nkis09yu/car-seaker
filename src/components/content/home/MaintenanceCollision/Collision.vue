@@ -43,6 +43,7 @@
                     </div>
                 </div>
             </div>
+            <div v-if="!claim.length">暂无相关记录</div>
         </div>
     </Card>
 </template>
@@ -94,7 +95,6 @@ export default {
             })
             .then( res => {
                 this.claim = res.data.data.claimRecord;
-                console.log(this.claim);
             })
         }
     }

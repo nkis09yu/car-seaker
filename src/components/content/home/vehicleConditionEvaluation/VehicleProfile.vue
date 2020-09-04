@@ -60,6 +60,7 @@
                     <p style="color: #999">里程排查</p>
                 </div>
             </div>
+            <div @click="$router.push('/home/carcondition?reportid='+$route.query.reportid)" class="btn">查看车况报告</div>
         </div>
     </Card>
 </template>
@@ -77,7 +78,7 @@ export default {
             type: Object,
             default: function(){
                 return {
-                    carWaterFlag: 1,
+                    carWaterFlag: 1
                 }
             }
         }

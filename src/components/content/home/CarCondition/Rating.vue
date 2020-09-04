@@ -1,31 +1,15 @@
 <template>
     <Card>
-        <div class="d-flex al-center jc-between car-head">
-            <h1 class="title">{{title}}</h1>
-            <div @click="openPopup">
-                <p>评级说明</p>
-                <img src="~assets/img/home/youjiantou.png" alt="">
-            </div>
-        </div>
         <div class="card-cont">
-            <div class="grade">
-                <img v-if="grade === 1" src="~assets/img/home/star1.png" alt="">
-                <img v-if="grade === 2" src="~assets/img/home/star2.png" alt="">
-                <img v-if="grade === 3" src="~assets/img/home/star3.png" alt="">
-                <img v-if="grade === 4" src="~assets/img/home/star4.png" alt="">
-                <img v-if="grade === 5" src="~assets/img/home/star5.png" alt="">
-                <p class="bold">{{dengji}}</p>
-            </div>
             <div class="gaikuang">
                 <div class="d-flex" style="margin-top: 20px">
-                    <div><b>{{yixingshi}}</b><p>已行驶/km</p></div>
-                    <div><b>{{yugu}}</b><p>预估里程/km</p></div>
-                    <div><b>{{nianjun}}</b><p>年均里程/km</p></div>
+                    <div><b>{{maintenanceData.mileageEstimate}}</b><p>预估里程/km</p></div>
+                    <div><b>{{maintenanceData.mainTainTimes}}</b><p>年均保养/次</p></div>
+                    <div><b>{{maintenanceData.mileageEveryYear}}</b><p>年均里程/km</p></div>
                 </div>
                 <div class="d-flex">
-                    <div><b>{{zuihou}}</b><p>最后保养</p></div>
-                    <div><b>{{jilu}}</b><p>最后记录</p></div>
-                    <div><b>{{baoyang}}</b><p>年均保养/次</p></div>
+                    <div><b>{{maintenanceData.lastMainTainTime}}</b><p>最后保养</p></div>
+                    <div><b>{{maintenanceData.lastRepairTime}}</b><p>最后维修</p></div>
                 </div>
             </div>
         </div>
@@ -40,6 +24,14 @@ export default {
         title: {
             type: String,
             required: true
+        },
+        maintenanceData: {
+            type: Object,
+            default: function(){
+                return {
+                    mileageEstimate: 0
+                }
+            }
         }
     },
     data(){
@@ -64,36 +56,9 @@ export default {
 
 <style scoped lang="scss">
     .card{
-        div.car-head{
-            align-items: center;
-            div{
-                display: flex;
-                align-items: center;
-                p{
-                    color: #666;
-                }   
-                img{
-                    width: 10px;
-                    height: 17px;
-                    margin-left: 8px;
-                }
-            }
-        }
+        padding-top: 5px;
         div.card-cont{
-            .grade{
-                text-align: center;
-                margin-bottom: 30px;
-                img{
-                    width: 180px;
-                    height: 26px;
-                }
-                p{
-                    font-size: 17px;
-                    margin-top: 12px;
-                }
-            }
             div.gaikuang{
-                border-top: 1px solid #ddd;
                 .d-flex{
                     text-align: center;
                     margin-top: 30px;

@@ -10,12 +10,12 @@
                     <!-- 维保记录 -->
                     <div class="jilu" v-show="tabActiveIndex === 0">
                         <div :class="{'focus': focus}" class="input">
-                            <input @blur="focus=false" @focus="focus=true" v-model.trim="vin" type="text" placeholder="请输入17位VIN码">
+                            <input @blur="focus=false" @focus="focus=true" v-model.trim="vincode" type="text" placeholder="请输入17位VIN码">
                             <img src="~assets/img/home/sao.png" alt="扫VIN">
                         </div>
                         <div @click="weibao" class="btn">立即查询</div>
 
-                        <div class="btn shili">示例报告</div>
+                        <div @click="$router.push('/home/maintenance?reportid=1&weibao=1')" class="btn shili">示例报告</div>
                         <div class="tips d-flex">
                             <div class="d-flex">
                                 <p class="color-999">常规品牌：</p>
@@ -33,11 +33,11 @@
                     <!-- 维保碰撞 -->
                     <div class="pengzhuang" v-show="tabActiveIndex === 1">
                         <div :class="{'focus': focus}" class="input">
-                            <input @blur="focus=false" @focus="focus=true" v-model.trim="vin" type="text" placeholder="请输入17位VIN码">
+                            <input @blur="focus=false" @focus="focus=true" v-model.trim="vincode" type="text" placeholder="请输入17位VIN码">
                             <img src="~assets/img/home/sao.png" alt="扫VIN">
                         </div>
                         <div @click="pengzhuang" class="btn">立即查询</div>
-                        <div @click="$router.push('/home/maintenance')" class="btn shili">示例报告</div>
+                        <div @click="$router.push('/home/maintenance?reportid=1')" class="btn shili">示例报告</div>
                         <div class="tips d-flex">
                             <div class="d-flex">
                                 <p class="color-999">常规品牌：</p>
@@ -54,7 +54,6 @@
                     </div>
                     <!-- 车况估价 -->
                     <div class="gujia" v-show="tabActiveIndex === 2">
-      
                         <div class="gujia-list">
                             <div class="gujia-item">
                                 <p class="title">VIN码</p>
@@ -62,7 +61,7 @@
                             </div>
                             <div class="gujia-item">
                                 <p class="title">品牌车型</p>
-                                <div @click="pinpai" class="xz"><p>{{pp}}</p><img src="~assets/img/home/youjiantou.png" alt=""></div>
+                                <div @click="openModel" class="xz"><p>{{model}}</p><img src="~assets/img/home/youjiantou.png" alt=""></div>
                             </div>
                             <div class="gujia-item">
                                 <p class="title">上牌城市</p>
@@ -86,7 +85,7 @@
                             </div>
                         </div>
                         <div @click="gujia" class="btn">立即查询</div>
-                        <div  @click="$router.push('/home/evaluation')" class="btn shili">示例报告</div>
+                        <div  @click="$router.push('/home/evaluation?reportid=1')" class="btn shili">示例报告</div>
                         <div class="tips d-flex">
                             <div class="d-flex">
                                 <p class="color-999">常规品牌：</p>
@@ -121,7 +120,6 @@
 
             </div>
 
-
             <Tips v-show="tabActiveIndex === 0" :tips="weibapTips" />
             <Tips v-show="tabActiveIndex === 1" :tips="pengzhuangTips" />
             <Tips v-show="tabActiveIndex === 2" :tips="gujiaTips" />
@@ -139,31 +137,43 @@
                     </div>
                 </div>
             </div> -->
+            
         </div>
+        <model-selector @closeModel="closeModel" v-if="showModel" @chooseModel="chooseModel"></model-selector>
     </div>
 </template>
 
 <script>
+import ModelSelector from '@/components/content/home/ModelSelector'
 import { areaList } from '@/assets/js/areaList.js'
 import Tips from '@/components/content/home/Tips'
+import carColors from '@/assets/js/carColors'
+import transferTimes from '@/assets/js/transferTimes'
 export default {
     components: {
-        Tips
+        Tips,
+        ModelSelector
     },
     data(){
         return {
+            cityArray: [],
             tabs: ['维保记录', '维保碰撞', '车况估价'],
             tabActiveIndex: 0,
-            vin: '',//vin码
-            vincode: '',
+            vincode: '',//vin码
+            model: '请选择',//品牌车型
+            modelId: '',
+            showModel: false,
+            city: '请选择',//上牌城市
+            cityId: null,
+            date: '请选择',//上牌时间
+            licheng: '',//表显里程
+            color: '请选择',//车身颜色
+            nums: '请选择',//过户次数
+
             focus: false,
             price: 20.00,//价格
-            licheng: '',//表显里程
-            pp: '请选择',
-            city: '请选择',
-            date: '请选择',
-            color: '请选择',
-            nums: '请选择',
+            
+            
             weibapTips: [
                 {
                     img: require('@/assets/img/home/wpg-1.jpg'),
@@ -212,35 +222,47 @@ export default {
         }
     },
     mounted(){
+        this.GetCbsCities();
+        
     },
     methods: {
-        pinpai(){
-            const that = this;
-            this.$weui.picker([
-            {
-                label: '品牌',
-                value: 0,
-            },{
-                label: '车系',
-                value: 1
-            },{
-                label: '车型',
-                value: 2
-            }
-            ], {
-                defaultValue: [0],
-                onConfirm: function (result) {
-                    that.pp = result[0].label;
-                },
-            });
+        // 获取城市列表
+        GetCbsCities(){
+            this.$axios.post('/api/search_vehicle_index.php?s=/Home/Report/GetCbsCities')
+            .then( res => {
+                this.cityArray = res.data.data;
+                for(let i=0;i<this.cityArray.length;i++){
+                    this.cityArray[i].label = this.cityArray[i].name;
+                    this.cityArray[i].children = this.cityArray[i].citys;
+                    delete this.cityArray[i].name;
+                    delete this.cityArray[i].citys;
+                    for(let j =0;j<this.cityArray[i].children.length; j++){
+                        this.cityArray[i].children[j].label = this.cityArray[i].children[j].name;
+                        delete this.cityArray[i].children[j].name;
+                    }
+                }
+            })
+        },
+        openModel(){
+            this.showModel = true;
+        },
+        chooseModel(item){
+            this.model = item.model;
+            this.modelId = item.id;
+            this.showModel = false;
+        },
+        closeModel(){
+            this.showModel = false;
         },
         chengshi(){
-            const that = this;
-            this.$weui.picker(areaList,
+            const _self = this;
+            this.$weui.picker(this.cityArray,
             {
-                defaultValue: [areaList[0]['label'], areaList[0]['children'][0]],
+                defaultValue: [this.cityArray[0]['label'], this.cityArray[0]['children'][0]['label']],
                 onConfirm: function (result) {
-                    that.city = result[1].label;
+                    _self.city = result[1].label;
+                    _self.cityId = result[1].id;
+                    console.log(result);
                 },
                 title: '请选择城市'
             });
@@ -260,61 +282,7 @@ export default {
         },
         yanse(){
             let that = this;
-            this.$weui.picker([
-            {
-                label: '紫色',
-                value: 0
-            },{
-                label: '蓝色',
-                value: 1
-            },{
-                label: '红色',
-                value: 2
-            },
-            {
-                label: '黄色',
-                value: 3
-            },{
-                label: '白色',
-                value: 4
-            },{
-                label: '灰色',
-                value: 5
-            },
-            {
-                label: '米色',
-                value: 6
-            },{
-                label: '棕色',
-                value: 7
-            },{
-                label: '粉红',
-                value: 8
-            },
-            {
-                label: '香槟色',
-                value: 9
-            },{
-                label: '橙色',
-                value: 10
-            },{
-                label: '黑色',
-                value: 11
-            },
-            {
-                label: '金色',
-                value: 12
-            },{
-                label: '银色',
-                value: 13
-            },{
-                label: '绿色',
-                value: 14
-            },{
-                label: '其他',
-                value: 15
-            }
-            ], {
+            this.$weui.picker(carColors, {
                 defaultValue: [0],
                 onConfirm: function (result) {
                     that.color = result[0].label;
@@ -323,45 +291,7 @@ export default {
         },
         guohu(){
             let that = this;
-            this.$weui.picker([
-            {
-                label: '0次',
-                value: 0,
-            },{
-                label: '1次',
-                value: 1
-            },{
-                label: '2次',
-                value: 2
-            },{
-                label: '3次',
-                value: 3
-            },{
-                label: '4次',
-                value: 4
-            },{
-                label: '5次',
-                value: 5
-            },{
-                label: '6次',
-                value: 6
-            },{
-                label: '7次',
-                value: 1
-            },{
-                label: '8次',
-                value: 7
-            },{
-                label: '9次',
-                value: 8
-            },{
-                label: '10次',
-                value: 9
-            },{
-                label: '10次以上',
-                value: 10
-            }
-            ], {
+            this.$weui.picker(transferTimes, {
                 defaultValue: [0],
                 onConfirm: function (result) {
                     that.nums = result[0].label;
@@ -369,28 +299,80 @@ export default {
             });
         },
         weibao(){
-            this.$router.push('/home/');
+            if(this.vincode === ''){
+                this.myToast('vin不能为空')
+            }else{
+                let reportid = 1;
+                this.$router.push(`/home/maintenance?reportid=${reportid}&weibao=1`);
+            }
         },
         pengzhuang(){
-            this.$router.push('/home/maintenance');
+            if(this.vincode === ''){
+                this.myToast('vin不能为空')
+            }else{
+                let reportid = 1;
+                this.$router.push(`/home/maintenance?reportid=${reportid}`);
+            }
+            
         },
         gujia(){
-            this.$router.push('/home/evaluation');
+            if(this.vincode === ''){
+                this.myToast('vin不能为空')
+            }else if(this.model === '请选择'){
+                this.myToast('请选择品牌车型')
+            }else if(this.city === '请选择'){
+                this.myToast('请选择上牌城市')
+            }else if(this.date === '请选择'){
+                this.myToast('请选择上牌时间')
+            }else if(this.licheng === ''){
+                this.myToast('请填写表显里程')
+            }else if(this.color === '请选择'){
+                this.myToast('请选择车身颜色')
+            }else if(this.nums === '请选择'){
+                this.myToast('请选择过户次数')
+            }else{
+                let reportid = 1;
+                this.$axios.post('/api/search_vehicle_index.php?s=/Home/Report/buyCbsPreciseReport', this.qs.stringify({
+                    model_id: this.model,
+                    city_id: this.cityId,
+                    vin: this.vincode,
+                    regdate: this.date,
+                    mile: this.licheng,
+                    color: this.color,
+                    dealnums: this.nums,
+                }))
+                .then( res => {
+                    console.log(res);
+                })
+                return;
+                this.$router.push(`/home/evaluation?reportid=${reportid}`);
+            }
+            
+
+            
         },
-        shibie(){
-            this.$router.push('/home/identify');
-        },
-        
-        // 获取城市列表
-        // async areaList(){
-        //     const res  = await this.$axios.post('http://yingyanchaxun.com/api/car_dealer_index.php?s=/Home/User/areaList');
-        //     console.log(res);
+        // shibie(){
+        //     this.$router.push('/home/identify');
         // }
+
+        myToast(txt){
+            this.$weui.toast(txt,{
+                duration: 1000,
+                className: 'my-toast'
+            });
+        }
     },
     
 }
 </script>
 
+<style lang="scss">
+    .my-toast{
+        i{
+            display: none;
+        }
+    }
+</style>
 <style lang="scss" scoped>
     .wrapper{
         width: 100vw;
@@ -471,11 +453,10 @@ export default {
                     .gujia-list{
                         .gujia-item{
                             margin-top: 8px;
-                            line-height: 56px;
                             display: flex;
                             justify-content: space-between;
                             align-items: center;
-                            padding: 0 12px;
+                            padding: 15px 12px;
                             background-color: #f8f8f8;
                             border-radius: 4px;
                             div{
@@ -488,7 +469,7 @@ export default {
                                     text-align: right;
                                     border: none;
                                     outline: none;
-                                    height: 40px;
+                                    // height: 40px;
                                     background-color: transparent;
                                     flex: 1;
                                     width: 30%;
@@ -502,7 +483,10 @@ export default {
                                 }
                             }
                             div.xz{
-                                
+                                margin-left: 10px;
+                                flex: 1;
+                                display: flex;
+                                justify-content: flex-end;
                                 img{
                                     width: 10px;
                                     height: 17px;

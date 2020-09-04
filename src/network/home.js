@@ -10,3 +10,13 @@ export function getHomeGoods(params){
     url:'/home/data',params
   })
 }
+
+export function getMaintenanceReport(){
+  return request({
+    url: '/api/search_vehicle_index.php?s=/Home/Report/getMaintenanceReport',
+    method: 'post',
+    params: {
+      reportid: 1
+    }
+  })
+}

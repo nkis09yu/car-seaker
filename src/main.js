@@ -6,6 +6,12 @@ import VueClipboard from 'vue-clipboard2'
 import weui from "weui.js/dist/weui";
 import 'weui'
 
+import qs from 'qs'
+Vue.prototype.qs = qs
+import Axios from "axios";
+Axios.defaults.baseURL = '/api' 
+Vue.prototype.$axios = Axios
+
 import moment from 'moment'
 Vue.prototype.$moment = moment
 

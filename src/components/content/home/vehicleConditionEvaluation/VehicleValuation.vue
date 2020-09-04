@@ -2,10 +2,11 @@
     <Card>
         <div class="car-head">
             <h1 class="title">{{title}}</h1>
+            <p>价格城市：{{preciseValuationData.carLicenseLocation}}</p>
         </div>
         <div class="card-cont">
             <div class="item">
-                <p class="sg">车商收购价：<b>{{priceData.recommendBuyPrice}}万</b></p>
+                <p class="sg">建议收购价：<b>{{priceData.recommendBuyPrice}}万</b></p>
                 <div class="d1"><div :style="{left: shogouPercent}"></div></div>
                 <div class="d2 d-flex">
                     <p class="p1 bold">{{priceData.industryBuyBottomPrice}}万</p>
@@ -14,7 +15,7 @@
                 </div>
             </div>
             <div class="item" style="margin: 30px 0">
-                <p class="sg">车商售车价：<b>{{priceData.recommendSellPrice}}万</b></p>
+                <p class="sg">建议售车价：<b>{{priceData.recommendSellPrice}}万</b></p>
                 <div class="d1"><div :style="{left: shouchePercent}"></div></div>
                 <div class="d2 d-flex">
                     <p class="p1 bold">{{priceData.industrySellBottomPrice}}万</p>
@@ -66,7 +67,10 @@ export default {
 
 <style scoped lang="scss">
     .card{
-
+        .car-head{
+            display: flex;
+            justify-content: space-between;
+        }
         div.card-cont{
             .item{
                 margin-top: 20px;

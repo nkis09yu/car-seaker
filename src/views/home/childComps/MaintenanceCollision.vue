@@ -1,7 +1,7 @@
 <template>
     <div class="maintenance">
         <Head>
-            <p class="bold">{{name}}</p>
+            <p class="bold">{{reportData.modelName}}</p>
             <p class="vin">VIN：{{reportData.vin}}</p>
             <p>时间：{{reportData.updateTime}}</p>
         </Head>
@@ -10,7 +10,7 @@
             <CarCondition :carConditionData="reportData" title="车况分析"/>
             <Mileage :rData="reportData" title="里程保养概况"/>
             <Maintenance :recordsRep="reportData.recordsRep" title="维保数据"/>
-            <Collision title="碰撞数据"/>
+            <Collision v-show="showPengzhuang" title="碰撞数据"/>
         </div>
         <Popup v-if="showPopup" @closePopup="closePopup" title="评级说明">
             <div class="p-title bold">事故火烧泡水评级说明</div>
@@ -41,9 +41,7 @@ export default {
     components: { Popup, Head, Rating, CarCondition, Mileage, Maintenance, Collision },
     data(){
         return {
-            name: '奥迪 A6',
-            vin: 'LSVFF26R3D2134566',
-            date: '2020-08-05 10:10:10',
+            showPengzhuang: true,
             showPopup: false,
             reportData: {
                 recordsRep: [],
@@ -58,16 +56,23 @@ export default {
         }
     },
     mounted(){
-        this.init();
+        this.fetch();
+        this.showPengzhuang = !this.$route.query.weibao;
     },
     methods: {
-        init(){
-            this.$axios.post('/api/search_vehicle_index.php?s=/Home/Report/getMaintenanceReport',{
-                reportid: 1
-            })
+        fetch(){
+            let loading = this.$weui.loading('加载中...');
+            this.$axios.post('/api/search_vehicle_index.php?s=/Home/Report/getMaintenanceReport', this.qs.stringify({
+                reportid: this.$route.query.reportid
+            }))
             .then( res => {
                 this.reportData = res.data.data.data;
                 console.log(this.reportData);
+                loading.hide();
+            })
+            .catch( err => {
+                console.log(err);
+                loading.hide();
             })
         },
         openPopup(){

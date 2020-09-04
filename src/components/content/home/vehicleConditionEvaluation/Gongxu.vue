@@ -4,7 +4,12 @@
             <h1 class="title">{{title}}</h1>
         </div>
         <div class="card-cont">
-            <div id="gongxu" style="width: 45%" class="evaluation-left"></div>
+            
+            <div style="width: 45%; position: relative">
+                <div id="gongxu" style="width: 100%; height: 100%;" class="evaluation-left"></div>
+                <div class="gx-tips">{{gx}}</div>
+            </div>
+            
             <div class="evaluation-right">
                 <div class="cki" style="margin-top: 0;">
                     <div class="gongji"></div>
@@ -43,12 +48,20 @@ export default {
     },
     data(){
         return {
-            vData: {}
+            vData: {},
+            gx: '供需平衡'
         }
     },
     watch: {
         valuationData(val){
             this.vData = val;
+            if(Number(val.demand)>Number(val.supply)){
+                this.gx = '供大于求';
+            }else if(Number(val.demand)===Number(val.supply)){
+                this.gx = '供需平衡';
+            }else if(Number(val.demand)<Number(val.supply)){
+                this.gx = '供小于求';
+            }
             this.drawPie('gongxu')
         }
     },
@@ -85,6 +98,16 @@ export default {
         div.card-cont{
             display: flex;
             margin-top: 10px;
+            .gx-tips{
+                width: 100%;
+                text-align: center;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 18px;
+                color: #716dff;
+                font-weight: 900;
+            }
             .evaluation-right{
                 margin-left: 40px;
                 .cki{

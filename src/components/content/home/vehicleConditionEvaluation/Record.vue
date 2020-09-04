@@ -29,6 +29,8 @@
                     <p style="margin-top: 12px;color: #999;">成交于{{item.dealDate}}</p>
                 </div>
             </div>
+
+            <div v-if="!dealRecords.length">暂无相关记录</div>
         </div>
 
     </Card>

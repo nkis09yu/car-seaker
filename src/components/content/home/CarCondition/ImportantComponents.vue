@@ -1,11 +1,11 @@
 <template>
     <Card>
         <div class="d-flex al-center jc-between car-head">
-            <h1 class="title">{{title}} {{normalRepairRecords.length}}</h1>
+            <h1 class="title">{{title}} {{componentAnalyzeRepairRecords.length}}</h1>
         </div>
         <div class="card-cont">
-            <div v-if="normalRepairRecords.length" class="maintenance-list">
-                <div class="maintenance-item" v-for="(item, index) in normalRepairRecords" :key="index">
+            <div class="maintenance-list">
+                <div class="maintenance-item" v-for="(item, index) in componentAnalyzeRepairRecords" :key="index">
                     <div class="m-top d-flex">
                         <p class="tt lb">概述</p>
                         <p class="cc">{{item.date}} | {{item.mileage}}公里 | {{item.type}}</p>
@@ -20,7 +20,6 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!normalRepairRecords.length">未查到相关记录</div>
         </div>
     </Card>
 </template>
@@ -34,7 +33,7 @@ export default {
             type: String,
             required: true
         },
-        normalRepairRecords: Array
+        componentAnalyzeRepairRecords: Array
     }
 }
 </script>

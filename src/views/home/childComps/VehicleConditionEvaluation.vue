@@ -1,8 +1,8 @@
 <template>
     <div id="report-page" @touchmove.prevent>
         <Head>
-            <p class="name bold">{{reportData.modelName}}</p>
-            <p class="vin">VIN：{{model.vin}}</p>
+            <p class="name bold">{{reportData.maintenanceData.modelName ? reportData.maintenanceData.modelName : '-'}}</p>
+            <p class="vin">报告时间：{{reportData.maintenanceData.vin ? reportData.maintenanceData.vin : '-'}}</p>
             <div @click="showGk = !showGk" class="d-flex gk">
                 <p>车辆概况</p>
                 <img v-show="!showGk" src="~assets/img/home/xiajiantou.png" alt="">
@@ -10,25 +10,27 @@
             </div>
             <div v-show="showGk" class="gaikuang">
                 <div class="d-flex">
-                    <div><b>123900</b><p>厂商指导价</p></div>
-                    <div><b>6档手自一体变速箱</b><p>变速箱</p></div>
-                    <div><b>1.598</b><p>排量</p></div>
+                    <div><b>{{reportData.preciseValuationData.carAge ? reportData.preciseValuationData.carAge : '-'}}</b><p>车龄</p></div>
+                    <div><b>{{reportData.preciseValuationData.firstPlateTime ? reportData.preciseValuationData.firstPlateTime : '-'}}</b><p>上牌日期</p></div>
+                    <div><b>{{reportData.preciseValuationData.miles ? reportData.preciseValuationData.miles : '-'}}</b><p>行驶里程</p></div>
                 </div>
                 <div class="d-flex">
-                    <div><b>汽油</b><p>燃料形式</p></div>
-                    <div><b>201212</b><p>上市日期</p></div>
-                    <div><b>停产</b><p>是否停产</p></div>
+                    <div><b>{{reportData.preciseValuationData.dealNums ? reportData.preciseValuationData.dealNums : '-'}}</b><p>过户次数</p></div>
+                    <div><b>{{reportData.preciseValuationData.carColor ? reportData.preciseValuationData.carColor : '-'}}</b><p>车辆颜色</p></div>
+                    <div><b>{{reportData.preciseValuationData.modelAnaly == 1 ? '是' : '否'}}</b><p>热门车型</p></div>
                 </div>
             </div>
         </Head>
         <div class="content">
-            <VehicleValuation :preciseValuationData="reportData.preciseValuationData" title="车辆估价"/>
-            <CarIndex title="车况指数"/>
-            <Rating title="历史车况综合评级"/>
-            <Gongxu :valuationData="reportData.preciseValuationData" title="本城市供需比"/>
-            <Chekuangbi :modelRatio="reportData.preciseValuationData.modelRatio" title="市场车况占比"/>
-            <Fenxi title="市场成交分析"/>
-            <Record :dealRecords="reportData.preciseValuationData.dealRecords" title="成交记录"/>
+            <VehicleValuation :preciseValuationData="reportData.preciseValuationData" title="车辆估价" />
+            <PriceTrend :monthsPrice="reportData.preciseValuationData.monthsPrice" :monthsAgoPrice="reportData.preciseValuationData.monthsAgoPrice" title="价格走势" />
+            <!-- <CarIndex title="车况指数" /> -->
+            <!-- <Rating title="车辆概况" /> -->
+            <VehicleProfile :maintenanceData="reportData.maintenanceData" title="车辆概况" />
+            <Gongxu :valuationData="reportData.preciseValuationData" title="本城市供需比" />
+            <Chekuangbi :modelRatio="reportData.preciseValuationData.modelRatio" title="市场车况占比" />
+            <Fenxi :marketPriceAnalyse="reportData.preciseValuationData.marketPriceAnalyse" title="市场成交分析" />
+            <Record :dealRecords="reportData.preciseValuationData.dealRecords" title="成交记录" />
             <ReportDescription title="报告说明"/>
         </div>
     </div>
@@ -37,8 +39,10 @@
 <script>
 import Head from '@/components/content/home/Head'
 import VehicleValuation from '@/components/content/home/vehicleConditionEvaluation/VehicleValuation'
-import CarIndex from '@/components/content/home/vehicleConditionEvaluation/CarIndex'
-import Rating from '@/components/content/home/vehicleConditionEvaluation/Rating'
+import PriceTrend from '@/components/content/home/vehicleConditionEvaluation/PriceTrend'
+// import CarIndex from '@/components/content/home/vehicleConditionEvaluation/CarIndex'
+// import Rating from '@/components/content/home/vehicleConditionEvaluation/Rating'
+import VehicleProfile from'@/components/content/home/vehicleConditionEvaluation/VehicleProfile'
 import Gongxu from '@/components/content/home/vehicleConditionEvaluation/Gongxu'
 import Chekuangbi from '@/components/content/home/vehicleConditionEvaluation/Chekuangbi'
 import Fenxi from '@/components/content/home/vehicleConditionEvaluation/Fenxi'
@@ -46,14 +50,12 @@ import Record from '@/components/content/home/vehicleConditionEvaluation/Record'
 import ReportDescription from '@/components/content/home/vehicleConditionEvaluation/ReportDescription'
 export default {
     name: 'Report',
-    components: { Head, VehicleValuation, CarIndex, Rating, Gongxu, Chekuangbi, Fenxi, Record, ReportDescription},
+    components: { Head, VehicleValuation, PriceTrend, VehicleProfile, Gongxu, Chekuangbi, Fenxi, Record, ReportDescription},
     data(){
         return {
-            model: {
-                name: '2017款标致307三厢1.6手动舒适版',
-                vin: 'LSVFF26R3D2134566',
-            },
             reportData: {
+                maintenanceData: {
+                },
                 dealRecords: [],
                 preciseValuationData: {
                     priceData: {},//价格数据
@@ -62,21 +64,26 @@ export default {
                 }
                 // valuationData: {}
             },
-            showGk: false
+            showGk: false,
         }
     },
-
     mounted(){
         this.fetch();
     },
     methods: {
         fetch(){
-            this.$axios.post('/api/search_vehicle_index.php?s=/Home/Report/getCbsPreciseReport',{
-                reportid: 1
-            })
+            let loading = this.$weui.loading('加载中...');
+            this.$axios.post('/api/search_vehicle_index.php?s=/Home/Report/getCbsPreciseReport', this.qs.stringify({
+                reportid: this.$route.query.reportid
+            }))
             .then( res => {
                 this.reportData = res.data.data;
                 console.log(this.reportData);
+                loading.hide();
+            })
+            .catch( err => {
+                loading.hide();
+                console.log(err);
             })
         }
     }
