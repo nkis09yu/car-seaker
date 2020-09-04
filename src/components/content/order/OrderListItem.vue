@@ -9,7 +9,7 @@
       <div>VIN码: {{ order.vin }}</div>
       <div @click="copyVin(order.vin)">复制VIN</div>
     </div>
-    <div class="order-list-item-time">查询时间: {{getFormatTime(order.time)}}</div>
+    <div class="order-list-item-time">查询时间: {{ getFormatTime(order.time) }}</div>
     <div class="order-list-item-count">查询金额: {{ order.count.toFixed(2) }}元</div>
   </div>
 </template>
@@ -54,19 +54,34 @@ export default {
       }
     },
     toOtherPage(order) {
-      if (order.status===0){
-        this.$emit('showSingleMessage','订单查询中，请稍等')
-      }else {
-        alert('跳转页面')
+      if (order.status === 0) {
+        this.$emit('showSingleMessage', '订单查询中，请稍等')
+      } else {
+        let path = ''
+        switch (order.type) {
+          case 0:
+            path = "/home/maintenance?reportid=1&weibao=1";
+            break;
+          case 1:
+            path = "/home/maintenance?reportid=1&weibao=1";
+            break;
+          case 2:
+            path = "/home/maintenance?reportid=1&weibao=1";
+            break;
+          case 3:
+            path = "/home/maintenance?reportid=1";
+            break;
+        }
+        this.$router.push('/home/maintenance?reportid=1&weibao=1')
       }
     },
     getFormatTime(val) {
       return formatDate(new Date(val), 'yyyy-MM-dd  hh:mm:ss')
     },
-    copyVin(val){
+    copyVin(val) {
       this.$copyText(val)
           .then(res => {
-            this.$emit('showSingleMessage','复制成功')
+            this.$emit('showSingleMessage', '复制成功')
           })
     }
   }
@@ -127,10 +142,11 @@ export default {
   color: #666666;
 }
 
-.order-list-item-vin>div{
+.order-list-item-vin > div {
   display: inline-block;
 }
-.order-list-item-vin>div:nth-child(2){
+
+.order-list-item-vin > div:nth-child(2) {
   position: absolute;
   right: 0;
   font-size: 14px;

@@ -7,7 +7,7 @@
       <scroll :probe-type="3"
               :pull-up-load="true"
               ref="scroll"
-              @reachBottom="loadMoreGoods"
+              @reachBottom="loadMoreInfo"
               @scroll="scrollPositionChange">
         <OrderListItem @showSingleMessage="showSingleMessageMethod" v-for="item in displayOrders"
                        :order="item"></OrderListItem>
@@ -41,11 +41,12 @@ export default {
       ],
       showSingleMessage: false,
       singleMessage: '',
-      timer: -1
+      timer: -1,
+      preIndex:0
     }
   },
   methods: {
-    loadMoreGoods() {
+    loadMoreInfo() {
     
     },
     scrollPositionChange() {
@@ -66,22 +67,29 @@ export default {
   },
   computed: {
     displayOrders() {
+      
       return this.currentIndex === 0 ? this.orders : this.orders.filter(item => {
         return item.status === (this.currentIndex - 1);
       })
     }
   },
- activated() {
-  
-   let fromProfile = this.$route.query.fromProfile;
-   let index = (typeof fromProfile ==='undefined')?0:parseInt(fromProfile)
-   this.$refs.tabControl.activeIndex=index
-   this.currentIndex=index
- },
-  watch:{
-    currentIndex(){
+  activated() {
+    this.currentIndex = 10;
+    let fromProfile = this.$route.query.fromProfile;
+    let index = (typeof fromProfile === 'undefined') ? this.preIndex : parseInt(fromProfile)
+    this.$refs.tabControl.activeIndex = index
+    // todo 防止窗口高度变化导致不能滚动的解决方案
+    setTimeout(() => {
+      this.currentIndex = index
+    }, 50)
+  },
+  deactivated() {
+    this.preIndex=this.currentIndex;
+  },
+  watch: {
+    currentIndex() {
       //this.$refs.scroll.refreshHeight();
-      this.$refs.scroll.backTop(0,0,0);
+      this.$refs.scroll.backTop(0, 0, 0);
     }
   }
 }
