@@ -94,6 +94,7 @@ export default {
       ++this.currentPicIndex === 3 ? this.currentPicIndex = 0 : null;
     },
     async getPromotionPost() {
+      await this.drawCanvas();
       //alert('进入图片上传方法')
       //canvas生成图片并上传
       let baseImage = this.canvas.toDataURL("image/jpg");
