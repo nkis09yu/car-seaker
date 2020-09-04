@@ -224,8 +224,8 @@ export default {
       //解决头像跨域生成图片报错的问题
       let headIcon = new Image()
       headIcon.crossOrigin = 'anonymous'
-      headIcon.src = document.getElementById('post-user-head-icon').src
-      //headIcon.src = this.$store.state.userInfo.headimgurl
+      //headIcon.src = document.getElementById('post-user-head-icon').src
+      headIcon.src = this.$store.state.userInfo.headimgurl
       this.ctx.drawImage(headIcon, (309 * this.ratio) / 2, 277 * this.ratio, 66 * this.ratio, 66 * this.ratio)
       //this.ctx.drawImage(document.getElementById('post-user-head-icon'), 315 / 2, 280, 60, 60)
       this.ctx.restore()
