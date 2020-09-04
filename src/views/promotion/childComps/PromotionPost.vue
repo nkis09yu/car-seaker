@@ -98,9 +98,16 @@ export default {
       //canvas生成图片并上传
       let baseImage = this.canvas.toDataURL("image/jpg");
       //todo 压缩图片？
-      let image = await this.dataURItoBlob(baseImage)
       // console.log(image)
-      
+      //let canvas = document.getElementById('canvas2');
+      //let ctx = canvas.getContext('2d');
+      //canvas.width=750
+      //canvas.height=1260
+      //ctx.drawImage(this.canvas,0,0,750,1260)
+      //let newImage = canvas.toDataURL('image/jpg')
+  
+      let image = await this.dataURItoBlob(baseImage)
+  
       //alert('创建form对象开始')
       let param = new FormData()  // 创建form对象
       param.append('file', image)  // 通过append向form对象添加数据
@@ -216,7 +223,8 @@ export default {
       //解决头像跨域生成图片报错的问题
       let headIcon = new Image()
       headIcon.crossOrigin = 'anonymous'
-      headIcon.src = this.$store.state.userInfo.headimgurl
+      headIcon.src = document.getElementById('post-user-head-icon').src
+      //headIcon.src = this.$store.state.userInfo.headimgurl
       this.ctx.drawImage(headIcon, (309 * this.ratio) / 2, 277 * this.ratio, 66 * this.ratio, 66 * this.ratio)
       //this.ctx.drawImage(document.getElementById('post-user-head-icon'), 315 / 2, 280, 60, 60)
       this.ctx.restore()
